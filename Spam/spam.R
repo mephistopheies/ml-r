@@ -115,8 +115,8 @@ ClassifySentense <- function(s, model, preprocess = T)
   {
     words <- unlist(PreprocessSentence(s))
   }
-  ham <- log(model$hamWordCount)
-  spam <- log(model$spamWordCount)
+  ham <- log(model$hamLabelCount/(model$hamLabelCount + model$spamLabelCount))
+  spam <- log(model$spamLabelCount/(model$hamLabelCount + model$spamLabelCount))
   for(i in 1:length(words))
   {
     ham <- ham + log((GetCount(words[i], model$ham) + model$laplaceFactor)
