@@ -1,7 +1,11 @@
 PreprocessSentence <- function(s)
 {
   # Cut and make some preprocessing with input sentence
-  words <- strsplit(gsub(pattern="[[:digit:]]+", replacement="1", x=tolower(s)), '[[:punct:][:blank:]]+')
+  #  INPUT:    string
+  #  OUTPUT:   list of strings
+  words <- strsplit(
+      gsub(pattern="[[:digit:]]+", replacement="1", x=tolower(s)), 
+      '[[:punct:][:blank:]]+')
   return(words)
 }
 
@@ -9,25 +13,35 @@ PreprocessSentence <- function(s)
 LoadData <- function(fileName = "./Data/Spam/SMSSpamCollection") 
 {
   # Read data from text file and makes simple preprocessing: 
-  #   to lower case -> replace all digit strings with 1 -> split with punctuation and blank characters
+  #   to lower case -> 
+  #     replace all digit strings with 1 -> 
+  #     split with punctuation and blank characters
+  #  INPUT:    name of file
+  #  OUTPUT:   data frame with lab and data fields
+  #              - lab is string
+  #              - data is list of strings
   con <- file(fileName,"rt")
   lines <- readLines(con)
   close(con)
-  df <- data.frame(lab = rep(NA, length(lines)), data = rep(NA, length(lines)))
+  df <- data.frame(
+    lab = rep(NA, length(lines)), 
+    data = rep(NA, length(lines)))
   for(i in 1:length(lines))
   {
     tmp <- unlist(strsplit(lines[i], '\t', fixed = T))
     df$lab[i] <- tmp[1]
     df$data[i] <- PreprocessSentence(tmp[2])
   }
-  
   return(df)
 }
 
 
 CreateDataSet <- function(dataSet, proportions = c(0.6, 0.2, 0.2))
 {
-  # Creates a list with indices of train, validation and test sets  
+  # Creates a list with indices of train, validation and test sets 
+  #  INPUT:    data frame from LoadData and vector of proportions
+  #  OUTPUT:   list of three lists which contains indices of items 
+  #            from input data frame
   proportions <- proportions/sum(proportions)
   hamIdx <- which(df$lab == "ham")    
   nham <- length(hamIdx)  
@@ -53,6 +67,8 @@ CreateDataSet <- function(dataSet, proportions = c(0.6, 0.2, 0.2))
 CreateModel <- function(data, laplaceFactor = 0)
 {
   # creates naive bayes spam classifier based on data
+  #  INPUT:    train data frame with lab and data fields;laplace factor
+  #  OUTPUT:   trained naive bayes model
   m <- list(laplaceFactor = laplaceFactor)
   m[["total"]] <- length(data$lab)
   m[["ham"]] <- list()  
@@ -102,6 +118,9 @@ CreateModel <- function(data, laplaceFactor = 0)
 ClassifySentense <- function(s, model, preprocess = T)
 {
   # calculate class of the input sentence based on the model
+  #  INPUT:    string sentence, model from CreateModel and
+  #            bool flag, if sentence should be preprocessed 
+  #  OUTPUT:   class of message HAM or SPAM
   GetCount <- function(w, ls)
   {
     if(is.null(ls[[w]]))
@@ -115,14 +134,18 @@ ClassifySentense <- function(s, model, preprocess = T)
   {
     words <- unlist(PreprocessSentence(s))
   }
-  ham <- log(model$hamLabelCount/(model$hamLabelCount + model$spamLabelCount))
-  spam <- log(model$spamLabelCount/(model$hamLabelCount + model$spamLabelCount))
+  ham <- log(model$hamLabelCount /
+               (model$hamLabelCount + model$spamLabelCount))
+  spam <- log(model$spamLabelCount /
+                (model$hamLabelCount + model$spamLabelCount))
   for(i in 1:length(words))
   {
-    ham <- ham + log((GetCount(words[i], model$ham) + model$laplaceFactor)
-                     /(model$hamWordCount + model$laplaceFactor*model$uniqueWordCount))
-    spam <- spam + log((GetCount(words[i], model$spam) + model$laplaceFactor)
-                       /(model$spamWordCount + model$laplaceFactor*model$uniqueWordCount))
+    ham <- ham + 
+      log((GetCount(words[i], model$ham) + model$laplaceFactor) /
+            (model$hamWordCount + model$laplaceFactor*model$uniqueWordCount))
+    spam <- spam + 
+      log((GetCount(words[i], model$spam) + model$laplaceFactor) /
+            (model$spamWordCount + model$laplaceFactor*model$uniqueWordCount))
   }
   if(ham >= spam)
   {
@@ -135,6 +158,8 @@ ClassifySentense <- function(s, model, preprocess = T)
 TestModel <- function(data, model)
 {
   # calculate percentage of errors
+  #  INPUT:    data for testing and model
+  #  OUTPUT:   percentage of mistakes
   errors <- 0
   for(i in 1:length(data$lab))
   {
@@ -148,8 +173,15 @@ TestModel <- function(data, model)
 }
 
 
-CrossValidation <- function(trainData, validationData, laplaceFactorValues, showLog = F)
+CrossValidation <- function(trainData, validationData, 
+                            laplaceFactorValues, 
+                            showLog = F)
 {
+  # Crossvalidation, search best Laplace factrom from given vector
+  #  INPUT:    train data, validation data, vector of possible 
+  #            factor values, and flag, if log should be shown
+  #  OUTPUT:   vector of percentage of errors for corresponding Laplace
+  #            factor values
   cvErrors <- rep(NA, length(laplaceFactorValues))
   for(i in 1:length(laplaceFactorValues))
   {
@@ -157,7 +189,8 @@ CrossValidation <- function(trainData, validationData, laplaceFactorValues, show
     cvErrors[i] <- TestModel(validationData, model)
     if(showLog)
     {
-      print(paste(laplaceFactorValues[i], ": error is ", cvErrors[i], sep=""))
+      print(paste(laplaceFactorValues[i], ": error is ", 
+                  cvErrors[i], sep=""))
     }
   }
   return(cvErrors)
