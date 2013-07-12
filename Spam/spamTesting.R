@@ -5,7 +5,7 @@ fileName <- "./Data/Spam/SMSSpamCollection"
 #df <- LoadData()
 #save(df, file="./Data/Spam/spamDF.Rda")
 load("./Data/Spam/spamDF.Rda")
-ds <- CreateDataSet(df, proportions = c(0.7, 0.2, 0.1))
+ds <- CreateDataSet(df, proportions = c(0.8, 0.2, 0.2))
 laplaceFactorValues <- 1:10
 cvErrors <- CrossValidation(df[ds$train, ], 
                             df[ds$validation, ], 
