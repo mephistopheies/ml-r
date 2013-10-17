@@ -1,4 +1,5 @@
 rm(list=ls())
+
 source("KMeans/kmeansFunctions.R")
 set.seed(148800)
 k <- 3

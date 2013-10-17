@@ -89,6 +89,32 @@ GetMedoid <- function(data, distance)
   ))
 }
 
+AveradeDistance <- function(distance, data, centroids)
+{
+  cost <- 0
+  labels <- rep(NA, dim(data)[1])
+  k <- dim(centroids)[1]
+  c <- centroids
+  
+  for(i in 1:dim(data)[1])
+  {
+    d <- rep(NA, k)
+    for(j in 1:k)
+    {
+      d[j] <- distance(data[i, ], c[j, ])
+    }
+    labels[i] <- which(d == min(d))
+  }
+  
+  for(i in 1:length(labels))
+  {
+    cost <- cost + distance(data[i, ], c[labels[i], ])
+  }
+  cost <- cost / dim(data)[1]
+  
+  return(cost)
+}
+
 KMeans.em <- function(k, data, distance, centroid, 
                       accuracy = 0.1, maxIterations = 1000, 
                       initialCentroids = NULL, showLog = F)
@@ -165,7 +191,8 @@ KMeans.em <- function(k, data, distance, centroid,
   
   return(list(
     labels = labels,
-    cost = costVec
+    cost = costVec,
+    centroids = c
   ))
 }
 
@@ -267,7 +294,8 @@ KMeans.gd <- function(k, data, distance, derivative,
   }
   return(list(
     labels = labels,
-    cost = costVec
+    cost = costVec,
+    centroids = c
   ))
 }
 
