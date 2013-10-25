@@ -58,7 +58,7 @@ GetEllipsePoints <- function(m.x, m.y, sigma, q = 0.75, n = 100)
   angles <- seq(0, 2*pi, length.out=n)
   cir1.points <- rbind(cos(angles), sin(angles))
   ellipse.centered <- (e$vectors %*% diag(sqrt(abs(e$values)))) %*% cir1.points
-  ellipse.biased <- matrix(rep(c(m.x, m.y), n), nrow=2, ncol=n) + ellipse.centered
+  ellipse.biased <- ellipse.centered + c(m.x, m.y)
   return(ellipse.biased)
 }
 
