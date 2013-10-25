@@ -1,7 +1,7 @@
 #http://en.wikipedia.org/wiki/Cluster_analysis#Internal_evaluation
 #Davies–Bouldin index
 
-DBIndex <- function(distance, data, centroids)
+DBIndex <- function(distance, data, centroids, labels = NA)
 {
   # Davies–Bouldin index
   #
@@ -20,7 +20,10 @@ DBIndex <- function(distance, data, centroids)
   {
     d[i, ] <- apply(data, 1, FUN = function(v) {distance(v, c[i, ])})
   }
-  labels <- apply(d, 2, which.min)
+  if(sum(is.na(labels)) == 0)
+  {
+    labels <- apply(d, 2, which.min)
+  }
   deltas <- rep(NA, k)
   for(i in 1:k)
   {
@@ -47,7 +50,6 @@ DBIndex <- function(distance, data, centroids)
   
   return(cost)
 }
-
   
 KMeans.DB <- function(k, data, distance, derivative,
                                 accuracy = 0.001, maxIterations = 1000, 

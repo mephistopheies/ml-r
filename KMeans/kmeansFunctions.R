@@ -177,6 +177,7 @@ KMeans.em <- function(k, data, distance, centroid,
     {
       cost <- cost + distance(data[i, ], c[labels[i], ])
     }
+    cost <- cost/dim(data)[1]
     if(showLog)
     {
       print(paste("Iter: ", iter,"; Cost = ", cost, sep=""))
@@ -247,6 +248,7 @@ KMeans.gd <- function(k, data, distance, derivative,
     {
       cost <- cost + min(d[, i])
     }
+    cost <- cost/dim(data)[1]
     if(showLog)
     {
       print(paste("Iter: ", iter,"; Cost = ", cost, sep=""))
