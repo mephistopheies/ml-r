@@ -127,3 +127,4 @@ ProjectData <- function(obs, base)
 
 
 
+#m <- matrix(c(1, 2, 3, 2, 4, 5, 3, 5, 6), ncol=3, nrow=3)

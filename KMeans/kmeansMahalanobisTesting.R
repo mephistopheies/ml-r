@@ -1,5 +1,4 @@
 rm(list=ls())
-library(ellipse)
 set.seed(10488)
 
 k <- 4
@@ -34,7 +33,7 @@ plot(data[, 1], data[, 2], pch=19, asp=1,
      main="artificial data")
 data <- data[, 1:2]
 initCentroids <- InitNewCentroid(k, data)
-points(initCentroids[, 1], initCentroids[, 2], col="black", pch=19)
+points(initCentroids[, 1], initCentroids[, 2], col="black", pch=c(19, 18, 17, 15))
 
 
 #kmeans EM

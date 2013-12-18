@@ -152,7 +152,7 @@ KMeans.Mahalanobis.em <- function(k, data,
 }
 
 
-KMeans.Mahalanobis.gd <- function(k, data, accuracy = 0.1, maxIterations = 1000, 
+KMeans.Mahalanobis.gd <- function(k, data, accuracy = 0.1, maxIterations = 1000, minCost = -Inf,
                                   learningRate = 1, initialCentroids = NULL, noChangeBreak = 100,
                                   showLog = F)
 {
@@ -226,6 +226,11 @@ KMeans.Mahalanobis.gd <- function(k, data, accuracy = 0.1, maxIterations = 1000,
     costVec <- append(costVec, cost)
     
     #stop conditions
+    if(cost < minCost)
+    {
+      print("minCost break")
+      break
+    }
     if(abs(lastCost - cost) < accuracy)
     {
       print("accuracy break")

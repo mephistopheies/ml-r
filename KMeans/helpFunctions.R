@@ -62,7 +62,10 @@ GetEllipsePoints <- function(m.x, m.y, sigma, q = 0.75, n = 100)
   return(ellipse.biased)
 }
 
-
+Euclidian.distance <- function(x, y)
+{
+  return(sqrt(sum((x - y)^2)))
+}
 
 
 

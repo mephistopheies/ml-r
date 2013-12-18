@@ -159,6 +159,11 @@ KMeans.em <- function(k, data, distance, centroid,
       labels[i] <- which(d == min(d))
     }
     
+    if(iter == maxIterations)
+    {
+      break
+    }
+    
     #maximization
     for(i in 1:dim(c)[1])
     {
