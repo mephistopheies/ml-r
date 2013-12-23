@@ -243,3 +243,54 @@ reg.logistic <- function(x, y, lambda = 0.1, maxIterations = 1000, accuracy=0.00
   
   
 }
+
+binaryClassifierEvaluation <- function(y, o, positiveLabel = 1, negativeLable = 0)
+{
+  # returns list with evaluation information
+  # 
+  # Args: 
+  #   y: real labels
+  #   o: predicted lables
+  #
+  # Returns:
+  #   returns list with evaluation information
+  tp <- sum((y == positiveLabel) & (o == positiveLabel))
+  tn <- sum((y == negativeLable) & (o == negativeLable))
+  fp <- sum((y == negativeLable) & (o == positiveLabel))
+  fn <- sum((y == positiveLabel) & (o == negativeLable))
+  
+  ppv <- tp/(tp + fp)
+  npv <- tn/(fn + tn)
+  tpr <- tp/(tp + fn)
+  tnr <- tn/(fp + tn)
+  
+  acc <- (tp + tn)/(tp + fp + fn + tn)
+  
+  f1score <- 2*ppv*tpr/(ppv + tpr)
+  
+  mcc.d <- rep(NA, 4)
+  mcc.d[1] <- sqrt(tp + fp)
+  mcc.d[2] <- sqrt(tp + fn)
+  mcc.d[3] <- sqrt(tn + fp)
+  mcc.d[4] <- sqrt(tn + fn)
+  mcc.dv <- prod(mcc.d) 
+  if(mcc.dv == 0)
+  {
+    mcc.dv <- 1
+  }
+  mcc <- (tp*tn - fp*fn)/mcc.dv
+  
+  return(list(
+      TP = tp,
+      TN = tn,
+      FP = fp,
+      FN = fn,
+      PPV_Precision = ppv,
+      TPR_Recall = tpr,
+      NPV = npv,
+      TNR = tnr,
+      Accuracy = acc,
+      F1_Score = f1score,
+      MatthewsCorrelationCoefficient = mcc
+    ))
+}
