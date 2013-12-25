@@ -181,7 +181,8 @@ reg.logistic.cost <- function(y, o)
   return(-sum(y*log(o) + (1 - y)*log(1 - o))/length(y))
 }
 
-reg.logistic <- function(x, y, lambda = 0.1, maxIterations = 1000, accuracy=0.0001, minError = -Inf, showLog = F)
+reg.logistic <- function(x, y, lambda = 0.1, maxIterations = 1000, accuracy=0.0001, minError = -Inf, 
+                         x.cv = NA, y.cv = NA, cvCostIncreaseStop = F, iterStopSkip = 1, showLog = F)
 {
   
   # returns regression coefficients
@@ -197,11 +198,16 @@ reg.logistic <- function(x, y, lambda = 0.1, maxIterations = 1000, accuracy=0.00
   
   #add bias column and init others
   x <- cbind(x, rep(1, dim(x)[1]))
-  #theta <- matrix(runif(n=dim(x)[2], min=-1, max=1), ncol=1, nrow=dim(x)[2])
   theta <- matrix(rnorm(mean=0, sd=1, n=dim(x)[2]), ncol=1, nrow=dim(x)[2])
   y <- matrix(y, ncol=1, nrow=length(y))
   
+  if(!is.na(x.cv[1]))
+  {
+    x.cv <- cbind(x.cv, rep(1, dim(x.cv)[1]))
+  }
+  
   cost <- c()
+  cvCost<- c()
   for(iter in 1:maxIterations)
   {
     #outputs
@@ -209,19 +215,38 @@ reg.logistic <- function(x, y, lambda = 0.1, maxIterations = 1000, accuracy=0.00
     
     #stoppers
     cost <- append(cost, reg.logistic.cost(y, o))
+    if(!is.na(x.cv[1]))
+    {
+      o.cv <- sigmoid(x.cv %*% theta)
+      cvCost <- append(cvCost, reg.logistic.cost(y.cv, o.cv))
+    }
     if(showLog)
     {
-      print(paste("Iteration #", iter, ", cost = ", cost[iter], sep=""))
+      if(!is.na(x.cv[1]))
+      {
+        print(paste("Iteration #", iter, ", cost = ", cost[iter], "; cv = ", cvCost[iter], sep=""))
+      }
+      else
+      {
+        print(paste("Iteration #", iter, ", cost = ", cost[iter], sep=""))
+      }
     }
-    if(iter > 1)
+    if(iter > iterStopSkip)
     {
-      if(abs(cost[iter - 1] - cost[iter]) <= accuracy)
+      if(cost[iter - 1] - cost[iter] > accuracy)
       {
         break
       }
       if(cost[iter] <= minError)
       {
         break
+      }
+      if(!is.na(x.cv[1]))
+      {
+        if(cvCostIncreaseStop && cvCost[iter - 1] < cvCost[iter])
+        {
+          break
+        }
       }
     }    
     
@@ -235,13 +260,21 @@ reg.logistic <- function(x, y, lambda = 0.1, maxIterations = 1000, accuracy=0.00
   
   return(list(
     theta = theta,
-    cost = cost
+    cost = cost,
+    cvCost = cvCost
   ))
   
   
   
   
   
+}
+
+reg.logistic.predict <- function(theta, x, p = 0.5)
+{
+  p <- sigmoid(cbind(x, rep(1, dim(x)[1])) %*% theta)
+  o <- as.numeric(p > 0.5)
+  return(o)
 }
 
 binaryClassifierEvaluation <- function(y, o, positiveLabel = 1, negativeLable = 0)

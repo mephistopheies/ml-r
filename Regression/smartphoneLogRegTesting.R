@@ -47,18 +47,24 @@ if(F)
        xlab="first", ylab="third", main="Two components")
 }
 
-#r.log.fit.all <- reg.logistic(m.proj, y, lambda = 0.001, maxIterations = 100000, 
-#                              accuracy=0, minError = -Inf, showLog = T)
-#save(r.log.fit.all, file="Data/Regression/r.log.fit.all_smartphones.Rda")
-load("Data/Regression/r.log.fit.all_smartphones.Rda")
-
 if(F)
 {
+  #10 components
+  #r.log.fit.all <- reg.logistic(m.proj, y, lambda = 0.001, maxIterations = 100000, 
+  #                              accuracy=0, minError = -Inf, showLog = T)
+  #save(r.log.fit.all, file="Data/Regression/r.log.fit.all_smartphones.Rda")
+  load("Data/Regression/r.log.fit.all_smartphones.Rda")
+  
   plot(r.log.fit.all$cost[1:length(r.log.fit.all$cost)], col="red", type="l",
        xlab="iteration", ylab="cost", main="logistic regression training")
   
-  p <- sigmoid(cbind(m.proj, rep(1, dim(m.proj)[1])) %*% r.log.fit.all$theta)
-  o <- as.numeric(p > 0.5)
+  #p <- sigmoid(cbind(m.proj, rep(1, dim(m.proj)[1])) %*% r.log.fit.all$theta)
+  #o <- as.numeric(p > 0.5)
+  o <- reg.logistic.predict(r.log.fit.all$theta, m.proj)
   q <- binaryClassifierEvaluation(y, o)
 }
+
+
+
+
 

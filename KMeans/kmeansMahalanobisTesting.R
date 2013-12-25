@@ -93,10 +93,10 @@ if(F)
 #mahalanobis gradient
 if(T)
 {
-  KMeans.Mahalanobis.gd.result <- KMeans.Mahalanobis.gd(k, data, accuracy = 0.01, maxIterations = 1000, 
+  KMeans.Mahalanobis.gd.result <- KMeans.Mahalanobis.gd(k, data, accuracy = 0, maxIterations = 10000, minCost=2, 
                                                         learningRate = 0.1, initialCentroids = initCentroids, showLog = T)
   
-  if(T)
+  if(F)
   {
     c <- KMeans.Mahalanobis.gd.result$centroids
     m <- KMeans.Mahalanobis.gd.result$covMatrices
@@ -107,15 +107,17 @@ if(T)
   }
   
   plot(data[, 1], data[, 2], pch=19, asp=1,
-       col=rainbow(k)[unclass(as.factor(KMeans.Mahalanobis.gd.result$labels))],
+       col=rainbow(k, alpha=0.2)[unclass(as.factor(KMeans.Mahalanobis.gd.result$labels))],
        xlab="first", ylab="third", 
        main=paste(k, " clusters; KMeans.Mahalanobis.gd \n cost = ", KMeans.Mahalanobis.gd.result$cost[length(KMeans.Mahalanobis.gd.result$cost)], sep=""))
   points(KMeans.Mahalanobis.gd.result$centroids[, 1], KMeans.Mahalanobis.gd.result$centroids[, 2], col="black", pch=19)
   for(i in 1:k)
   {
-    points(ellipse(KMeans.Mahalanobis.gd.result$covMatrices[[i]], 
-                   centre=KMeans.Mahalanobis.gd.result$centroids[i, ]), 
-           col="black", type="l")
+    p <- GetEllipsePoints(KMeans.Mahalanobis.gd.result$centroids[i, 1], 
+                          KMeans.Mahalanobis.gd.result$centroids[i, 2],
+                          KMeans.Mahalanobis.gd.result$covMatrices[[i]], q = 0.95)
+    
+    points(p[1, ], p[2, ], type="l", col="black")
   }
 }
 
