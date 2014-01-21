@@ -1,5 +1,5 @@
 rm(list = ls())
-set.seed(1488)
+set.seed(14880)
 source("KMeans/helpFunctions.R")
 source("KMeans/kmeansMahalanobisFunctions.R")
 
