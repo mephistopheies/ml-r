@@ -126,7 +126,7 @@ if __name__ == '__main__':
     labels_test = labels_idx[test_idx]
 
     m = MaxEnt(4, 3)
-    m.train(data_train, labels_train, 100)
+    m.train(data_train, labels_train, 1000)
 
     accuracy = 0
     for i in range(len(labels_test)):
